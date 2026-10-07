@@ -1,0 +1,1477 @@
+<!DOCTYPE html>
+<html lang="ms" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Game Interaktif ASK Tingkatan 2</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            cyber: {
+              bg: '#0f172a',
+              card: '#1e293b',
+              border: '#334155',
+              accent: '#06b6d4',
+              accentHover: '#0891b2',
+              success: '#10b981',
+              warning: '#f59e0b',
+              danger: '#ef4444',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #0b0f19;
+      color: #f8fafc;
+      font-family: 'Inter', sans-serif;
+    }
+    .code-font {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .glass-card {
+      background: rgba(30, 41, 59, 0.75);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .glow-cyan {
+      box-shadow: 0 0 15px rgba(6, 182, 212, 0.35);
+    }
+    .glow-green {
+      box-shadow: 0 0 15px rgba(16, 185, 129, 0.35);
+    }
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0f172a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #06b6d4;
+    }
+    /* Flowchart shape styles */
+    .fc-oval {
+      border-radius: 9999px;
+    }
+    .fc-parallelogram {
+      transform: skew(-12deg);
+    }
+    .fc-parallelogram > div {
+      transform: skew(12deg);
+    }
+    .fc-diamond {
+      transform: rotate(45deg);
+    }
+    .fc-diamond > div {
+      transform: rotate(-45deg);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-cyan-500 selection:text-black">
+
+  <!-- Top Navigation Header -->
+  <header class="bg-slate-900/90 backdrop-blur-md border-b border-slate-800 sticky top-0 z-40 px-4 py-3">
+    <div class="max-w-5xl mx-auto flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center font-extrabold text-xl text-white shadow-lg shadow-cyan-500/20">
+          ASK
+        </div>
+        <div>
+          <h1 class="font-bold text-base md:text-lg leading-tight bg-gradient-to-r from-cyan-400 to-indigo-300 bg-clip-text text-transparent">
+            Cabaran Asas Sains Komputer T2
+          </h1>
+          <p class="text-xs text-slate-400">Mod Pembelajaran Interaktif</p>
+        </div>
+      </div>
+
+      <div id="game-stats" class="hidden flex items-center space-x-4">
+        <div class="text-right">
+          <div class="text-xs text-slate-400 uppercase tracking-wider">Jumlah Markah</div>
+          <div class="text-lg md:text-2xl font-black text-cyan-400 font-mono">
+            <span id="score-display">0</span> <span class="text-xs text-slate-400">/ 70</span>
+          </div>
+        </div>
+        <button id="sound-toggle" onclick="toggleSound()" class="p-2.5 rounded-lg bg-slate-800 border border-slate-700 hover:bg-slate-700 text-slate-300 transition" title="Tukar Bunyi">
+          <svg id="sound-icon-on" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path></svg>
+          <svg id="sound-icon-off" class="w-5 h-5 hidden text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15zM17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"></path></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Progress bar -->
+    <div id="progress-container" class="hidden max-w-5xl mx-auto mt-3">
+      <div class="flex justify-between items-center text-xs text-slate-400 mb-1">
+        <span id="section-badge" class="px-2 py-0.5 rounded font-semibold text-xs bg-cyan-950 text-cyan-300 border border-cyan-800">
+          BAHAGIAN A
+        </span>
+        <span id="question-progress-text">Soalan 1 daripada 22</span>
+      </div>
+      <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden border border-slate-700">
+        <div id="progress-bar" class="bg-gradient-to-r from-cyan-500 to-indigo-500 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-5xl mx-auto w-full px-4 py-6 flex-grow flex flex-col justify-center">
+
+    <!-- SCREEN 1: Welcome Screen -->
+    <div id="screen-welcome" class="glass-card rounded-2xl p-6 md:p-10 text-center shadow-2xl relative overflow-hidden">
+      <div class="absolute -right-16 -top-16 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -left-16 -bottom-16 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 text-xs font-semibold uppercase tracking-wider mb-4">
+        🎮 Mod Pembelajaran ASK
+      </div>
+
+      <h2 class="text-3xl md:text-5xl font-extrabold tracking-tight text-white mb-4">
+        Cabaran Interaktif <span class="bg-gradient-to-r from-cyan-400 to-indigo-400 bg-clip-text text-transparent">Asas Sains Komputer</span> Tingkatan 2
+      </h2>
+
+      <p class="text-slate-300 text-sm md:text-base max-w-2xl mx-auto mb-8 leading-relaxed">
+        Uji kefahaman anda dalam Sistem Nombor Perlapanan, Perenambelasan, Kod ASCII, Kawalan Ulangan, Pilihan, dan Pengaturcaraan Python melalui siri aktiviti interaktif.
+      </p>
+
+      <!-- Structure Breakdown Card -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-left mb-8 max-w-3xl mx-auto">
+        <div class="bg-slate-900/80 border border-slate-800 p-4 rounded-xl">
+          <div class="text-cyan-400 font-bold text-lg mb-1">Bahagian A</div>
+          <div class="text-2xl font-black text-white mb-1">10 Soalan</div>
+          <p class="text-xs text-slate-400">10 Markah • Soalan Objektif & Analisis Kod</p>
+        </div>
+        <div class="bg-slate-900/80 border border-slate-800 p-4 rounded-xl">
+          <div class="text-indigo-400 font-bold text-lg mb-1">Bahagian B</div>
+          <div class="text-2xl font-black text-white mb-1">10 Soalan</div>
+          <p class="text-xs text-slate-400">40 Markah • Drag & Drop, Padanan, Trace Table & Kod</p>
+        </div>
+        <div class="bg-slate-900/80 border border-slate-800 p-4 rounded-xl">
+          <div class="text-purple-400 font-bold text-lg mb-1">Bahagian C</div>
+          <div class="text-2xl font-black text-white mb-1">2 Soalan</div>
+          <p class="text-xs text-slate-400">20 Markah • Bina Carta Alir & Atur Cara Python</p>
+        </div>
+      </div>
+
+      <button onclick="startGame()" class="px-8 py-4 bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-slate-950 font-extrabold rounded-xl shadow-lg shadow-cyan-500/25 transition transform hover:-translate-y-0.5 text-lg">
+        Mula Memainkan Game 🚀
+      </button>
+    </div>
+
+    <!-- SCREEN 2: Question Active Container -->
+    <div id="screen-question" class="hidden flex-grow flex flex-col justify-between">
+      
+      <!-- Question Card Header -->
+      <div class="glass-card rounded-2xl p-5 md:p-8 mb-4 border border-slate-800 relative">
+        <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
+          <div class="flex items-center space-x-2">
+            <span id="question-number" class="text-sm font-bold text-cyan-400 bg-cyan-950 px-3 py-1 rounded-lg border border-cyan-800">
+              SOALAN A1
+            </span>
+            <span id="question-marks" class="text-xs text-slate-400 bg-slate-800 px-2.5 py-1 rounded-lg">
+              [ 1 markah ]
+            </span>
+          </div>
+          <!-- Modal Table Trigger if question uses ASCII -->
+          <button id="ascii-btn" onclick="openAsciiModal()" class="hidden flex items-center gap-1.5 text-xs text-cyan-300 bg-cyan-900/50 hover:bg-cyan-900 border border-cyan-700 px-3 py-1.5 rounded-lg transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+            Lihat Jadual ASCII
+          </button>
+        </div>
+
+        <!-- Question Prompt Text -->
+        <div id="question-text" class="text-base md:text-lg text-slate-100 font-medium leading-relaxed mb-6">
+          <!-- Dynamic Text Inserted Here -->
+        </div>
+
+        <!-- Interactive Question Workspace -->
+        <div id="interactive-workspace" class="min-h-[160px] flex flex-col justify-center">
+          <!-- Dynamic Mechanics Inserted Here -->
+        </div>
+      </div>
+
+      <!-- Feedback Area & Control Actions -->
+      <div class="glass-card rounded-xl p-4 border border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4">
+        <!-- Feedback text -->
+        <div id="feedback-container" class="min-h-[2.5rem] flex items-center text-sm w-full md:w-auto">
+          <div id="feedback-text" class="text-slate-400 font-medium italic">
+            Sila pilih atau lengkapkan jawapan anda.
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex items-center space-x-3 w-full md:w-auto justify-end">
+          <button id="btn-submit" onclick="checkCurrentAnswer()" class="w-full md:w-auto px-6 py-2.5 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold rounded-lg shadow-md transition">
+            Semak Jawapan
+          </button>
+          <button id="btn-next" onclick="nextQuestion()" class="hidden w-full md:w-auto px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-lg shadow-md transition flex items-center justify-center gap-2">
+            <span>Seterusnya</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- SCREEN 3: Final Results Screen -->
+    <div id="screen-results" class="hidden glass-card rounded-2xl p-6 md:p-10 text-center shadow-2xl relative">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 text-xs font-semibold uppercase tracking-wider mb-4">
+        🎉 Keputusan Akhir
+      </div>
+
+      <h2 class="text-3xl md:text-4xl font-black text-white mb-2">
+        Tahniah, Anda Telah Tamat!
+      </h2>
+      <p class="text-slate-400 text-sm mb-6">Berikut adalah ringkasan prestasi anda dalam Ujian Interaktif ASK Tingkatan 2.</p>
+
+      <!-- Big Score Banner -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 max-w-md mx-auto mb-8 shadow-inner">
+        <div class="text-xs text-slate-400 uppercase tracking-widest font-bold mb-1">JUMLAH MARKAH KESELURUHAN</div>
+        <div class="text-5xl md:text-6xl font-black bg-gradient-to-r from-cyan-400 via-indigo-300 to-emerald-400 bg-clip-text text-transparent font-mono my-2">
+          <span id="final-score">0</span> <span class="text-2xl text-slate-500">/ 70</span>
+        </div>
+        <div id="performance-grade" class="text-sm font-bold text-cyan-400 mt-2">
+          -
+        </div>
+      </div>
+
+      <!-- Breakdown by Section -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-2xl mx-auto mb-8 text-left">
+        <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl">
+          <div class="text-xs font-bold text-slate-400 uppercase">Bahagian A</div>
+          <div class="text-2xl font-black text-cyan-400 font-mono my-1"><span id="score-sec-a">0</span> / 10</div>
+          <div class="text-xs text-slate-400">Soalan Objektif (10m)</div>
+        </div>
+        <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl">
+          <div class="text-xs font-bold text-slate-400 uppercase">Bahagian B</div>
+          <div class="text-2xl font-black text-indigo-400 font-mono my-1"><span id="score-sec-b">0</span> / 40</div>
+          <div class="text-xs text-slate-400">Soalan Pelbagai Mekanik (40m)</div>
+        </div>
+        <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl">
+          <div class="text-xs font-bold text-slate-400 uppercase">Bahagian C</div>
+          <div class="text-2xl font-black text-purple-400 font-mono my-1"><span id="score-sec-c">0</span> / 20</div>
+          <div class="text-xs text-slate-400">Soalan Carta Alir & Kod (20m)</div>
+        </div>
+      </div>
+
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <button onclick="resetGame()" class="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-slate-950 font-bold rounded-xl shadow-lg shadow-cyan-500/20 transition">
+          Cuba Lagi 🔄
+        </button>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ASCII Reference Modal -->
+  <div id="ascii-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-lg w-full p-6 shadow-2xl relative max-h-[90vh] flex flex-col">
+      <div class="flex justify-between items-center pb-3 border-b border-slate-800 mb-4">
+        <h3 class="text-lg font-bold text-cyan-400">Jadual Rujukan Kod ASCII</h3>
+        <button onclick="closeAsciiModal()" class="text-slate-400 hover:text-white p-1 text-xl">✕</button>
+      </div>
+      <div class="overflow-y-auto pr-2 space-y-2 text-sm font-mono">
+        <div class="grid grid-cols-3 bg-slate-800 p-2 rounded text-slate-300 font-bold text-xs uppercase">
+          <span>Aksara</span>
+          <span>Perpuluhan</span>
+          <span>Perlapanan</span>
+        </div>
+        <div class="grid grid-cols-3 bg-slate-900/50 p-2 rounded text-slate-200 border-b border-slate-800">
+          <span>A</span><span>65</span><span class="text-cyan-400">101₈</span>
+        </div>
+        <div class="grid grid-cols-3 bg-slate-900/50 p-2 rounded text-slate-200 border-b border-slate-800">
+          <span>B</span><span>66</span><span class="text-cyan-400">102₈</span>
+        </div>
+        <div class="grid grid-cols-3 bg-slate-900/50 p-2 rounded text-slate-200 border-b border-slate-800">
+          <span>C</span><span>67</span><span class="text-cyan-400">103₈</span>
+        </div>
+        <div class="grid grid-cols-3 bg-slate-900/50 p-2 rounded text-slate-200 border-b border-slate-800">
+          <span>D</span><span>68</span><span class="text-cyan-400">104₈</span>
+        </div>
+        <div class="grid grid-cols-3 bg-slate-900/50 p-2 rounded text-slate-200 border-b border-slate-800">
+          <span>E</span><span>69</span><span class="text-cyan-400">105₈</span>
+        </div>
+        <div class="grid grid-cols-3 bg-slate-900/50 p-2 rounded text-slate-200 border-b border-slate-800">
+          <span>F</span><span>70</span><span class="text-cyan-400">106₈</span>
+        </div>
+        <div class="grid grid-cols-3 bg-slate-900/50 p-2 rounded text-slate-200 border-b border-slate-800">
+          <span>G</span><span>71</span><span class="text-cyan-400">107₈</span>
+        </div>
+        <div class="grid grid-cols-3 bg-slate-900/50 p-2 rounded text-slate-200 border-b border-slate-800">
+          <span>H</span><span>72</span><span class="text-cyan-400">110₈</span>
+        </div>
+      </div>
+      <div class="mt-4 pt-3 border-t border-slate-800 text-right">
+        <button onclick="closeAsciiModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-lg">
+          Tutup
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="py-4 text-center text-xs text-slate-500 border-t border-slate-800/60 bg-slate-950/40">
+    Subjek Asas Sains Komputer (ASK) Tingkatan 2 • Hak Cipta Terpelihara
+  </footer>
+
+  <script>
+    /* =============================================================
+       AUDIO SYNTHESIS ENGINE (Pure Web Audio API - No external files)
+       ============================================================= */
+    let audioCtx = null;
+    let soundEnabled = true;
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+    }
+
+    function toggleSound() {
+      soundEnabled = !soundEnabled;
+      document.getElementById('sound-icon-on').classList.toggle('hidden', !soundEnabled);
+      document.getElementById('sound-icon-off').classList.toggle('hidden', soundEnabled);
+    }
+
+    function playSound(type) {
+      if (!soundEnabled) return;
+      initAudio();
+      if (!audioCtx) return;
+
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      const now = audioCtx.currentTime;
+
+      if (type === 'click') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(600, now);
+        gain.gain.setValueAtTime(0.05, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+        osc.start(now);
+        osc.stop(now + 0.05);
+      } else if (type === 'correct') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(523.25, now); // C5
+        osc.frequency.setValueAtTime(659.25, now + 0.1); // E5
+        osc.frequency.setValueAtTime(783.99, now + 0.2); // G5
+        gain.gain.setValueAtTime(0.08, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+        osc.start(now);
+        osc.stop(now + 0.35);
+      } else if (type === 'wrong') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(220, now); // A3
+        osc.frequency.setValueAtTime(180, now + 0.1);
+        gain.gain.setValueAtTime(0.08, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+        osc.start(now);
+        osc.stop(now + 0.3);
+      }
+    }
+
+    /* =============================================================
+       GAME STATE MANAGEMENT & QUESTIONS DATA BANK
+       ============================================================= */
+    let currentQuestionIndex = 0;
+    let scores = {
+      secA: 0,
+      secB: 0,
+      secC: 0
+    };
+    let userAnswers = {};
+
+    // Locked Question Bank Definition
+    const questionsData = [
+      // ---------------- BAHAGIAN A (10 x 1m = 10m) ----------------
+      {
+        id: "A1",
+        section: "A",
+        marks: 1,
+        title: "Soalan A1",
+        hint: "Ingat bahawa nombor perlapanan (Asas 8) hanya menggunakan digit dari 0 hingga 7.",
+        text: "Sebuah sistem menggunakan nombor asas 8.<br><br>Antara berikut, yang manakah merupakan nombor yang sah dalam sistem tersebut?",
+        type: "mcq",
+        options: [
+          { id: "A", text: "527₈" },
+          { id: "B", text: "638₈" },
+          { id: "C", text: "719₈" },
+          { id: "D", text: "804₈" }
+        ],
+        correct: "A"
+      },
+      {
+        id: "A2",
+        section: "A",
+        marks: 1,
+        title: "Soalan A2",
+        hint: "Cari nombor yang mengandungi digit 8 atau 9.",
+        text: "Antara berikut, yang manakah <strong>tidak boleh</strong> digunakan sebagai nombor perlapanan?",
+        type: "mcq",
+        options: [
+          { id: "A", text: "426₈" },
+          { id: "B", text: "571₈" },
+          { id: "C", text: "703₈" },
+          { id: "D", text: "892₈" }
+        ],
+        correct: "D"
+      },
+      {
+        id: "A3",
+        section: "A",
+        marks: 1,
+        title: "Soalan A3",
+        hint: "Kira kedudukan abjad: M=77, N=78, O=79, P=?",
+        text: "Diberi bahawa kod ASCII bagi huruf <strong>M</strong> ialah <strong>77</strong>.<br><br>Apakah kod ASCII bagi huruf <strong>P</strong>?",
+        type: "mcq",
+        options: [
+          { id: "A", text: "78" },
+          { id: "B", text: "79" },
+          { id: "C", text: "80" },
+          { id: "D", text: "81" }
+        ],
+        correct: "C"
+      },
+      {
+        id: "A4",
+        section: "A",
+        marks: 1,
+        title: "Soalan A4",
+        hint: "Dalam penukaran asas, apakah nilai yang dikumpul dan dibaca dari bawah ke atas?",
+        text: "Rajah menunjukkan proses menukarkan nombor perpuluhan kepada nombor perlapanan:<br>" +
+              "<div class='my-3 p-3 bg-slate-900 border border-slate-800 rounded-lg text-center font-mono text-sm space-y-1'>" +
+              "<div>Bahagi nombor dengan 8</div><div>↓</div><div class='text-cyan-400 font-bold'>[ P ]</div><div>↓</div><div>Ulang proses sehingga hasil bahagi tidak boleh dibahagi lagi</div><div>↓</div><div>Baca baki daripada bawah ke atas</div></div>" +
+              "Apakah yang paling sesuai bagi <strong>P</strong>?",
+        type: "mcq",
+        options: [
+          { id: "A", text: "Catat hasil bahagi sahaja" },
+          { id: "B", text: "Catat baki bagi setiap pembahagian" },
+          { id: "C", text: "Darab baki dengan 8" },
+          { id: "D", text: "Tolak nombor dengan 8" }
+        ],
+        correct: "B"
+      },
+      {
+        id: "A5",
+        section: "A",
+        marks: 1,
+        title: "Soalan A5",
+        hint: "Ralat ini berlaku semasa program SEDANG DILAKSANAKAN (runtime).",
+        text: "Sebuah program berhenti ketika sedang dilaksanakan kerana operasi yang dilakukan menyebabkan masalah semasa program berjalan.<br><br>Apakah jenis ralat tersebut?",
+        type: "mcq",
+        options: [
+          { id: "A", text: "Ralat logik" },
+          { id: "B", text: "Ralat masa larian" },
+          { id: "C", text: "Ralat sintaks" },
+          { id: "D", text: "Ralat algoritma" }
+        ],
+        correct: "B"
+      },
+      {
+        id: "A6",
+        section: "A",
+        marks: 1,
+        title: "Soalan A6",
+        hint: "Ulangan bermaksud melaksanakan arahan secara berulang-ulang.",
+        text: "Antara berikut, yang manakah menunjukkan <strong>struktur kawalan ulangan</strong>?",
+        type: "mcq",
+        options: [
+          { id: "A", text: "Program memilih satu daripada dua tindakan berdasarkan syarat." },
+          { id: "B", text: "Program melaksanakan satu arahan sahaja." },
+          { id: "C", text: "Program melaksanakan sekumpulan arahan berulang kali." },
+          { id: "D", text: "Program memilih satu daripada beberapa pilihan." }
+        ],
+        correct: "C"
+      },
+      {
+        id: "A7",
+        section: "A",
+        marks: 1,
+        title: "Soalan A7",
+        hint: "Nombor yang mengandungi titik perpuluhan (seperti 26.8) mewakili nombor nyata.",
+        text: "Teliti pemboleh ubah berikut:<br><br><code class='code-font text-cyan-300 bg-slate-900 px-3 py-1 rounded border border-slate-800'>suhu = 26.8</code><br><br>Apakah jenis data yang paling sesuai?",
+        type: "mcq",
+        options: [
+          { id: "A", text: "String" },
+          { id: "B", text: "Integer" },
+          { id: "C", text: "Double" },
+          { id: "D", text: "Boolean" }
+        ],
+        correct: "C"
+      },
+      {
+        id: "A8",
+        section: "A",
+        marks: 1,
+        title: "Soalan A8",
+        hint: "Gunakan tertib operasi matematik (darab didahulukan sebelum tambah): 2 * 3 = 6, kemudian 6 + 6.",
+        text: "Teliti kod berikut:<br><pre class='code-font my-2 p-3 bg-slate-900 rounded border border-slate-800 text-cyan-300'>x = 6\ny = 2\nprint(x + y * 3)</pre>Apakah output yang akan dipaparkan?",
+        type: "mcq",
+        options: [
+          { id: "A", text: "24" },
+          { id: "B", text: "12" },
+          { id: "C", text: "18" },
+          { id: "D", text: "8" }
+        ],
+        correct: "B"
+      },
+      {
+        id: "A9",
+        section: "A",
+        marks: 1,
+        title: "Soalan A9",
+        hint: "Sebelum jawapan dipaparkan, proses apakah yang mesti dibuat terlebih dahulu?",
+        text: "Antara langkah berikut, yang manakah perlu dilakukan <strong>sebelum</strong> memaparkan hasil pengiraan?",
+        type: "mcq",
+        options: [
+          { id: "A", text: "Memaparkan hasil" },
+          { id: "B", text: "Melakukan pengiraan" },
+          { id: "C", text: "Menamatkan program" },
+          { id: "D", text: "Mengulangi output" }
+        ],
+        correct: "B"
+      },
+      {
+        id: "A10",
+        section: "A",
+        marks: 1,
+        title: "Soalan A10",
+        hint: "Penggunaan 'if', 'elif', dan 'else' menunjukkan berbilang pilihan.",
+        text: "Teliti kod berikut:<br><pre class='code-font my-2 p-3 bg-slate-900 rounded border border-slate-800 text-cyan-300'>gred = \"B\"\n\nif gred == \"A\":\n    print(\"Sangat baik\")\nelif gred == \"B\":\n    print(\"Baik\")\nelif gred == \"C\":\n    print(\"Memuaskan\")\nelse:\n    print(\"Perlu usaha\")</pre>Apakah struktur kawalan yang digunakan?",
+        type: "mcq",
+        options: [
+          { id: "A", text: "Pilihan" },
+          { id: "B", text: "Pilihan bersarang" },
+          { id: "C", text: "Pilihan pelbagai" },
+          { id: "D", text: "Ulangan" }
+        ],
+        correct: "C"
+      },
+
+      // ---------------- BAHAGIAN B (10 x 4m = 40m) ----------------
+      {
+        id: "B1",
+        section: "B",
+        marks: 4,
+        title: "Soalan B1",
+        hint: "Setiap satu BETUL/SALAH bernilai 1 markah. Nombor perlapanan tidak boleh ada digit 8.",
+        text: "Tentukan sama ada setiap pernyataan tentang <strong>Sistem Perlapanan</strong> berikut BETUL atau SALAH.",
+        type: "tf_group",
+        statements: [
+          { id: 1, text: "Sistem perlapanan mempunyai lapan digit yang sah." },
+          { id: 2, text: "Digit 8 boleh digunakan dalam nombor perlapanan." },
+          { id: 3, text: "Sistem perlapanan juga dikenali sebagai Sistem Asas 8." },
+          { id: 4, text: "Digit yang digunakan ialah 0 hingga 7." }
+        ],
+        correct: { 1: "BETUL", 2: "SALAH", 3: "BETUL", 4: "BETUL" }
+      },
+      {
+        id: "B2",
+        section: "B",
+        marks: 4,
+        title: "Soalan B2",
+        hint: "Klik ✓ untuk nombor sah (semua digit 0-7) dan ✗ untuk nombor tidak sah (mengandungi 8 atau 9).",
+        text: "Tandakan <strong>✓</strong> bagi nombor yang sah sebagai nombor perlapanan dan <strong>✗</strong> bagi nombor yang tidak sah.",
+        type: "tick_cross",
+        items: [
+          { id: 1, label: "247₈" },
+          { id: 2, label: "581₈" },
+          { id: 3, label: "630₈" },
+          { id: 4, label: "907₈" }
+        ],
+        correct: { 1: "✓", 2: "✗", 3: "✓", 4: "✗" }
+      },
+      {
+        id: "B3",
+        section: "B",
+        marks: 4,
+        title: "Soalan B3",
+        hint: "Sistem perenambelasan mengandungi digit 0-9 dan A-F.",
+        text: "Pilih BETUL atau SALAH bagi pernyataan berkaitan <strong>Sistem Perenambelasan</strong>.",
+        type: "tf_group",
+        statements: [
+          { id: 1, text: "Sistem perenambelasan menggunakan 16 simbol digit." },
+          { id: 2, text: "Huruf A hingga F digunakan dalam sistem perenambelasan." },
+          { id: 3, text: "Digit 9 merupakan digit yang tidak sah dalam sistem perenambelasan." },
+          { id: 4, text: "Sistem perenambelasan boleh digunakan untuk mewakili warna dalam model RGB." }
+        ],
+        correct: { 1: "BETUL", 2: "BETUL", 3: "SALAH", 4: "BETUL" }
+      },
+      {
+        id: "B4",
+        section: "B",
+        marks: 4,
+        title: "Soalan B4",
+        hasAsciiModal: true,
+        hint: "Gunakan butang 'Lihat Jadual ASCII' di atas untuk menyemak kod perlapanan (cth: B = 102₈).",
+        text: "Gunakan jadual ASCII yang disediakan.<br>Tukarkan aksara berikut kepada kod nombor perlapanan (masukkan nombor seperti 102₈ atau 102):",
+        type: "input_group",
+        inputs: [
+          { id: "B", label: "i. B =" },
+          { id: "D", label: "ii. D =" },
+          { id: "F", label: "iii. F =" },
+          { id: "H", label: "iv. H =" }
+        ],
+        correct: { "B": "102", "D": "104", "F": "106", "H": "110" }
+      },
+      {
+        id: "B5",
+        section: "B",
+        marks: 4,
+        title: "Soalan B5",
+        hint: "Padankan P, Q, R, S dengan nombor penerangan yang tepat.",
+        text: "Padankan jenis struktur kawalan berikut dengan penerangan yang paling sesuai:<br>" +
+              "<div class='grid grid-cols-2 md:grid-cols-4 gap-2 my-3 text-xs font-bold text-cyan-300 font-mono'>" +
+              "<div class='p-2 bg-slate-900 border border-slate-800 rounded'>P = Pilihan bersarang</div>" +
+              "<div class='p-2 bg-slate-900 border border-slate-800 rounded'>Q = Ulangan for</div>" +
+              "<div class='p-2 bg-slate-900 border border-slate-800 rounded'>R = Ulangan while</div>" +
+              "<div class='p-2 bg-slate-900 border border-slate-800 rounded'>S = Pilihan pelbagai</div>" +
+              "</div>",
+        type: "matching_drop",
+        items: [
+          { id: 1, desc: "1. Arahan diulang berdasarkan bilangan ulangan yang ditentukan." },
+          { id: 2, desc: "2. Satu struktur pilihan berada di dalam struktur pilihan yang lain." },
+          { id: 3, desc: "3. Arahan dilaksanakan berulang kali selagi syarat dipenuhi." },
+          { id: 4, desc: "4. Program menyediakan beberapa pilihan tindakan berdasarkan keadaan yang berbeza." }
+        ],
+        options: ["P", "Q", "R", "S"],
+        correct: { 1: "Q", 2: "P", 3: "R", 4: "S" }
+      },
+      {
+        id: "B6",
+        section: "B",
+        marks: 4,
+        title: "Soalan B6",
+        hint: "Pilih blok syarat While dan tindakan penolakan 3 yang betul.",
+        text: "Output yang dikehendaki:<br><div class='inline-block my-2 px-4 py-2 bg-slate-900 border border-slate-800 rounded code-font text-emerald-400 font-bold'>18<br>15<br>12<br>9<br>6<br>3</div><br>Lengkapkan pseudokod berikut dengan menyeret blok yang betul:",
+        type: "pseudocode_builder",
+        correct: ["nombor >= 3", "Paparkan nombor", "nombor = nombor - 3"]
+      },
+      {
+        id: "B7",
+        section: "B",
+        marks: 4,
+        title: "Soalan B7",
+        hint: "Taipkan output tepat baris demi baris mengikut print().",
+        text: "Teliti kod Python berikut:<br><pre class='code-font my-2 p-3 bg-slate-900 rounded border border-slate-800 text-cyan-300'>nama = \"Ali\"\nsubjek = \"ASK\"\n\nprint(nama)\nprint(subjek)\nprint(nama + \" \" + subjek)</pre>Lengkapkan output bagi ketiga-tiga arahan print:",
+        type: "output_fill",
+        inputs: [
+          { id: 1, label: "Baris 1 (print(nama)):" },
+          { id: 2, label: "Baris 2 (print(subjek)):" },
+          { id: 3, label: "Baris 3 (print(nama + \" \" + subjek)):" }
+        ],
+        correct: { 1: "Ali", 2: "ASK", 3: "Ali ASK" }
+      },
+      {
+        id: "B8",
+        section: "B",
+        marks: 4,
+        title: "Soalan B8",
+        hint: "Pilih 2 kesalahan pada kod asal dan pilih pembetulan yang sepadan.",
+        text: "Teliti kod berikut:<br><pre class='code-font my-2 p-3 bg-slate-900 rounded border border-slate-800 text-red-300'>umur = int(input(\"Masukkan umur: \"))\n\nif umur >= 13\n    print(\"Layak\")\nelse:\n    print(\"Tidak layak\")</pre>Pilih 2 kesalahan yang terdapat pada kod dan cadangan pembetulannya:",
+        type: "debug_selection",
+        options: [
+          { id: 1, label: "Simbol ':' diperlukan selepas syarat 'if umur >= 13'.", correct: true },
+          { id: 2, label: "Struktur / Indentasi arahan selepas 'if' perlu dianjakkan ke dalam.", correct: true },
+          { id: 3, label: "Pemboleh ubah 'umur' mesti ditukar kepada String.", correct: false },
+          { id: 4, label: "Kata kunci 'else' mesti ditukar kepada 'elif'.", correct: false }
+        ]
+      },
+      {
+        id: "B9",
+        section: "B",
+        marks: 4,
+        title: "Soalan B9",
+        hint: "Fungsi range(2, 6) menghasilkan nombor 2, 3, 4, 5. Hasil tambah = 2 + 3 + 4 + 5 = 14.",
+        text: "Teliti kod gelung berikut:<br><pre class='code-font my-2 p-3 bg-slate-900 rounded border border-slate-800 text-cyan-300'>jumlah = 0\n\nfor n in range(2, 6):\n    jumlah = jumlah + n\n\nprint(jumlah)</pre>Jawab soalan analisis dalam jadual pengesanan (trace table) berikut:",
+        type: "trace_table",
+        correctA: "2, 3, 4, 5",
+        correctB: "14"
+      },
+      {
+        id: "B10",
+        section: "B",
+        marks: 4,
+        title: "Soalan B10",
+        hint: "Syarai 50-79 menggunakan 'elif markah >= 50:', dan selebihnya menggunakan 'else:'.",
+        text: "Lengkapkan kod bagi syarat berikut:<br><span class='text-xs text-slate-400'>Syarat: 80+ → Cemerlang | 50 hingga 79 → Baik | kurang daripada 50 → Perlu usaha</span>",
+        type: "code_fill_drag",
+        correctSlots: {
+          slot1: "elif markah >= 50:",
+          slot2: "else:"
+        }
+      },
+
+      // ---------------- BAHAGIAN C (2 x 10m = 20m) ----------------
+      {
+        id: "C1",
+        section: "C",
+        marks: 10,
+        title: "Soalan C1 (Sistem Perpustakaan)",
+        hint: "Bahagian (a) menguji jenis pilihan (Pilihan bersarang) & pemboleh ubah. Bahagian (b) susun blok carta alir.",
+        text: "Sebuah sistem perpustakaan sekolah menentukan sama ada seseorang murid boleh meminjam buku.<br>" +
+              "<div class='p-3 bg-slate-900 border border-slate-800 rounded my-3 text-xs text-slate-300 leading-relaxed'>" +
+              "<strong>Peraturan:</strong> Murid boleh meminjam buku jika jumlah buku &lt; 3 DAN tiada denda tertunggak.</div>",
+        type: "section_c1",
+        correctStructure: "pilihan bersarang",
+        correctVars: ["jumlah_buku", "denda"],
+        correctFlowchartOrder: [
+          "Mula",
+          "Masukkan jumlah buku dan status denda",
+          "Jumlah buku < 3 ?",
+          "Tiada denda ?",
+          "Paparkan \"Boleh meminjam\"",
+          "Tamat"
+        ]
+      },
+      {
+        id: "C2",
+        section: "C",
+        marks: 10,
+        title: "Soalan C2 (Pengiraan Bayaran Elektrik)",
+        hint: "(a) 150 unit * 0.30 = 45.00. (b) Bina kod Python lengkap bagi sistem elektrik.",
+        text: "Sebuah sistem mengira jumlah bayaran elektrik berdasarkan jumlah unit elektrik yang digunakan.<br>" +
+              "<div class='p-3 bg-slate-900 border border-slate-800 rounded my-2 text-xs font-mono text-cyan-300'>Kira jumlah = unit × 0.30</div>",
+        type: "section_c2",
+        correctCalc: "45",
+        correctPythonLines: {
+          line1: "unit = float(input(\"Masukkan unit elektrik: \"))",
+          line2: "jumlah = unit * 0.30",
+          line3: "print(\"Jumlah bayaran ialah RM\", jumlah)"
+        }
+      }
+    ];
+
+    /* =============================================================
+       GAME FLOW CONTROL & SCREEN SWITCHING
+       ============================================================= */
+    function startGame() {
+      playSound('click');
+      currentQuestionIndex = 0;
+      scores = { secA: 0, secB: 0, secC: 0 };
+      userAnswers = {};
+
+      document.getElementById('screen-welcome').classList.add('hidden');
+      document.getElementById('screen-results').classList.add('hidden');
+      document.getElementById('screen-question').classList.remove('hidden');
+      document.getElementById('game-stats').classList.remove('hidden');
+      document.getElementById('progress-container').classList.remove('hidden');
+
+      renderQuestion();
+    }
+
+    function resetGame() {
+      playSound('click');
+      document.getElementById('screen-results').classList.add('hidden');
+      document.getElementById('screen-welcome').classList.remove('hidden');
+      document.getElementById('game-stats').classList.add('hidden');
+      document.getElementById('progress-container').classList.add('hidden');
+    }
+
+    function updateHeaderStats() {
+      const totalScore = scores.secA + scores.secB + scores.secC;
+      document.getElementById('score-display').textContent = totalScore;
+
+      const q = questionsData[currentQuestionIndex];
+      const progressPct = Math.round(((currentQuestionIndex + 1) / questionsData.length) * 100);
+      document.getElementById('progress-bar').style.width = progressPct + '%';
+      document.getElementById('question-progress-text').textContent = `Soalan ${currentQuestionIndex + 1} daripada ${questionsData.length}`;
+      document.getElementById('section-badge').textContent = `BAHAGIAN ${q.section}`;
+    }
+
+    function openAsciiModal() {
+      playSound('click');
+      document.getElementById('ascii-modal').classList.remove('hidden');
+    }
+
+    function closeAsciiModal() {
+      playSound('click');
+      document.getElementById('ascii-modal').classList.add('hidden');
+    }
+
+    /* =============================================================
+       QUESTION RENDERER & INTERACTIVE MECHANICS
+       ============================================================= */
+    function renderQuestion() {
+      const q = questionsData[currentQuestionIndex];
+      updateHeaderStats();
+
+      // Set Header info
+      document.getElementById('question-number').textContent = `${q.title} (${q.section})`;
+      document.getElementById('question-marks').textContent = `[ ${q.marks} markah ]`;
+      document.getElementById('question-text').innerHTML = q.text;
+
+      // Show/Hide ASCII modal button
+      if (q.hasAsciiModal) {
+        document.getElementById('ascii-btn').classList.remove('hidden');
+      } else {
+        document.getElementById('ascii-btn').classList.add('hidden');
+      }
+
+      // Reset Feedback and buttons
+      document.getElementById('feedback-text').className = "text-slate-400 font-medium italic";
+      document.getElementById('feedback-text').innerHTML = "Sila lengkapkan jawapan anda dan klik <strong>Semak Jawapan</strong>.";
+      document.getElementById('btn-submit').classList.remove('hidden');
+      document.getElementById('btn-next').classList.add('hidden');
+
+      const workspace = document.getElementById('interactive-workspace');
+      workspace.innerHTML = '';
+
+      // Render based on mechanics
+      switch (q.type) {
+        case 'mcq':
+          renderMCQ(q, workspace);
+          break;
+        case 'tf_group':
+          renderTFGroup(q, workspace);
+          break;
+        case 'tick_cross':
+          renderTickCross(q, workspace);
+          break;
+        case 'input_group':
+          renderInputGroup(q, workspace);
+          break;
+        case 'matching_drop':
+          renderMatchingDrop(q, workspace);
+          break;
+        case 'pseudocode_builder':
+          renderPseudocodeBuilder(q, workspace);
+          break;
+        case 'output_fill':
+          renderOutputFill(q, workspace);
+          break;
+        case 'debug_selection':
+          renderDebugSelection(q, workspace);
+          break;
+        case 'trace_table':
+          renderTraceTable(q, workspace);
+          break;
+        case 'code_fill_drag':
+          renderCodeFillDrag(q, workspace);
+          break;
+        case 'section_c1':
+          renderSectionC1(q, workspace);
+          break;
+        case 'section_c2':
+          renderSectionC2(q, workspace);
+          break;
+      }
+    }
+
+    /* ---------------- TYPE RENDERERS ---------------- */
+
+    // MCQ
+    function renderMCQ(q, container) {
+      const grid = document.createElement('div');
+      grid.className = 'grid grid-cols-1 md:grid-cols-2 gap-3';
+
+      q.options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'mcq-opt w-full text-left p-4 rounded-xl border border-slate-800 bg-slate-900/80 hover:bg-slate-800 hover:border-cyan-500/50 transition flex items-center space-x-3 text-slate-200';
+        btn.onclick = () => {
+          playSound('click');
+          document.querySelectorAll('.mcq-opt').forEach(b => {
+            b.classList.remove('border-cyan-400', 'bg-cyan-950/40', 'glow-cyan');
+          });
+          btn.classList.add('border-cyan-400', 'bg-cyan-950/40', 'glow-cyan');
+          userAnswers[q.id] = opt.id;
+        };
+        btn.innerHTML = `<span class="w-8 h-8 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center font-bold text-cyan-400 font-mono text-sm">${opt.id}</span>
+                         <span class="text-sm font-medium">${opt.text}</span>`;
+        grid.appendChild(btn);
+      });
+      container.appendChild(grid);
+    }
+
+    // TF Group
+    function renderTFGroup(q, container) {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'space-y-3';
+      userAnswers[q.id] = {};
+
+      q.statements.forEach(stmt => {
+        const row = document.createElement('div');
+        row.className = 'p-3.5 bg-slate-900/80 border border-slate-800 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-3';
+        row.innerHTML = `<div class="text-xs md:text-sm text-slate-200 font-medium">${stmt.text}</div>
+                         <div class="flex items-center space-x-2 shrink-0">
+                           <button onclick="selectTF('${q.id}', ${stmt.id}, 'BETUL', this)" class="tf-btn-${stmt.id} px-4 py-1.5 rounded-lg border border-slate-700 text-xs font-bold text-slate-300 hover:bg-emerald-950/50 hover:border-emerald-500 transition">BETUL</button>
+                           <button onclick="selectTF('${q.id}', ${stmt.id}, 'SALAH', this)" class="tf-btn-${stmt.id} px-4 py-1.5 rounded-lg border border-slate-700 text-xs font-bold text-slate-300 hover:bg-rose-950/50 hover:border-rose-500 transition">SALAH</button>
+                         </div>`;
+        wrapper.appendChild(row);
+      });
+      container.appendChild(wrapper);
+    }
+
+    function selectTF(qId, stmtId, val, btn) {
+      playSound('click');
+      if (!userAnswers[qId]) userAnswers[qId] = {};
+      userAnswers[qId][stmtId] = val;
+
+      document.querySelectorAll(`.tf-btn-${stmtId}`).forEach(b => {
+        b.classList.remove('bg-emerald-500', 'bg-rose-500', 'text-slate-950', 'border-transparent', 'glow-green');
+        b.classList.add('text-slate-300', 'border-slate-700');
+      });
+
+      btn.classList.remove('text-slate-300', 'border-slate-700');
+      btn.classList.add('text-slate-950', 'font-extrabold');
+      if (val === 'BETUL') {
+        btn.classList.add('bg-emerald-400');
+      } else {
+        btn.classList.add('bg-rose-400');
+      }
+    }
+
+    // Tick Cross
+    function renderTickCross(q, container) {
+      const grid = document.createElement('div');
+      grid.className = 'grid grid-cols-1 md:grid-cols-2 gap-3';
+      userAnswers[q.id] = {};
+
+      q.items.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'p-4 bg-slate-900/80 border border-slate-800 rounded-xl flex items-center justify-between';
+        card.innerHTML = `<span class="font-mono text-base font-bold text-cyan-300">${item.label}</span>
+                          <div class="flex items-center space-x-2">
+                            <button onclick="selectTickCross('${q.id}', ${item.id}, '✓', this)" class="tc-btn-${item.id} w-10 h-10 rounded-xl border border-slate-700 text-slate-300 font-bold hover:bg-emerald-950 hover:border-emerald-500 transition">✓</button>
+                            <button onclick="selectTickCross('${q.id}', ${item.id}, '✗', this)" class="tc-btn-${item.id} w-10 h-10 rounded-xl border border-slate-700 text-slate-300 font-bold hover:bg-rose-950 hover:border-rose-500 transition">✗</button>
+                          </div>`;
+        grid.appendChild(card);
+      });
+      container.appendChild(grid);
+    }
+
+    function selectTickCross(qId, itemId, val, btn) {
+      playSound('click');
+      if (!userAnswers[qId]) userAnswers[qId] = {};
+      userAnswers[qId][itemId] = val;
+
+      document.querySelectorAll(`.tc-btn-${itemId}`).forEach(b => {
+        b.classList.remove('bg-emerald-500', 'bg-rose-500', 'text-slate-950', 'border-transparent');
+      });
+
+      btn.classList.add(val === '✓' ? 'bg-emerald-400' : 'bg-rose-400', 'text-slate-950');
+    }
+
+    // Input Group
+    function renderInputGroup(q, container) {
+      const grid = document.createElement('div');
+      grid.className = 'grid grid-cols-1 sm:grid-cols-2 gap-4';
+      userAnswers[q.id] = {};
+
+      q.inputs.forEach(inp => {
+        const card = document.createElement('div');
+        card.className = 'p-3.5 bg-slate-900/80 border border-slate-800 rounded-xl flex items-center space-x-3';
+        card.innerHTML = `<label class="text-sm font-bold text-cyan-300 font-mono w-16">${inp.label}</label>
+                          <input type="text" oninput="userAnswers['${q.id}']['${inp.id}'] = this.value.trim()" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-cyan-300 font-mono focus:border-cyan-500 focus:outline-none" placeholder="cth: 1028 / 102">`;
+        grid.appendChild(card);
+      });
+      container.appendChild(grid);
+    }
+
+    // Matching Drop
+    function renderMatchingDrop(q, container) {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'space-y-3';
+      userAnswers[q.id] = {};
+
+      q.items.forEach(item => {
+        const row = document.createElement('div');
+        row.className = 'p-3.5 bg-slate-900/80 border border-slate-800 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-3';
+        let selectOpts = '<option value="">-- Pilih (P/Q/R/S) --</option>';
+        q.options.forEach(opt => {
+          selectOpts += `<option value="${opt}">${opt}</option>`;
+        });
+
+        row.innerHTML = `<div class="text-xs md:text-sm text-slate-200">${item.desc}</div>
+                         <select onchange="userAnswers['${q.id}'][${item.id}] = this.value" class="bg-slate-950 border border-slate-700 text-cyan-300 font-mono text-xs font-bold rounded-lg px-3 py-2 focus:border-cyan-500 focus:outline-none">
+                           ${selectOpts}
+                         </select>`;
+        wrapper.appendChild(row);
+      });
+      container.appendChild(wrapper);
+    }
+
+    // Pseudocode Builder
+    function renderPseudocodeBuilder(q, container) {
+      userAnswers[q.id] = { slot1: "", slot2: "", slot3: "" };
+
+      const wrap = document.createElement('div');
+      wrap.className = 'space-y-4';
+
+      wrap.innerHTML = `
+        <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 code-font text-xs md:text-sm space-y-2 text-slate-300">
+          <div>Mula</div>
+          <div>Isytihar pemboleh ubah nombor</div>
+          <div>Setkan nombor = 18</div>
+          <div class="flex items-center space-x-2">
+            <span>While</span>
+            <select onchange="userAnswers['${q.id}'].slot1 = this.value" class="bg-slate-950 border border-cyan-800 text-cyan-300 px-2 py-1 rounded text-xs">
+              <option value="">-- pilih syarat --</option>
+              <option value="nombor >= 3">nombor >= 3</option>
+              <option value="nombor <= 18">nombor <= 18</option>
+              <option value="nombor > 0">nombor > 0</option>
+            </select>
+          </div>
+          <div class="pl-6 space-y-2">
+            <select onchange="userAnswers['${q.id}'].slot2 = this.value" class="bg-slate-950 border border-cyan-800 text-cyan-300 px-2 py-1 rounded text-xs">
+              <option value="">-- pilih tindakan 1 --</option>
+              <option value="Paparkan nombor">Paparkan nombor</option>
+              <option value="Kira nombor = nombor + 3">Kira nombor = nombor + 3</option>
+            </select>
+            <br>
+            <select onchange="userAnswers['${q.id}'].slot3 = this.value" class="bg-slate-950 border border-cyan-800 text-cyan-300 px-2 py-1 rounded text-xs">
+              <option value="">-- pilih tindakan 2 --</option>
+              <option value="nombor = nombor - 3">nombor = nombor - 3</option>
+              <option value="nombor = nombor / 3">nombor = nombor / 3</option>
+            </select>
+          </div>
+          <div>Tamat</div>
+        </div>
+      `;
+      container.appendChild(wrap);
+    }
+
+    // Output Fill
+    function renderOutputFill(q, container) {
+      const wrap = document.createElement('div');
+      wrap.className = 'space-y-3';
+      userAnswers[q.id] = {};
+
+      q.inputs.forEach(inp => {
+        const card = document.createElement('div');
+        card.className = 'p-3 bg-slate-900/80 border border-slate-800 rounded-xl flex items-center space-x-3';
+        card.innerHTML = `<label class="text-xs font-semibold text-slate-300 w-48">${inp.label}</label>
+                          <input type="text" oninput="userAnswers['${q.id}'][${inp.id}] = this.value.trim()" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-sm text-cyan-300 font-mono focus:border-cyan-500 focus:outline-none" placeholder="Taip output di sini...">`;
+        wrap.appendChild(card);
+      });
+      container.appendChild(wrap);
+    }
+
+    // Debug Selection
+    function renderDebugSelection(q, container) {
+      const wrap = document.createElement('div');
+      wrap.className = 'space-y-2';
+      userAnswers[q.id] = [];
+
+      q.options.forEach(opt => {
+        const item = document.createElement('label');
+        item.className = 'flex items-start space-x-3 p-3 bg-slate-900/80 border border-slate-800 rounded-xl cursor-pointer hover:border-slate-700 transition';
+        item.innerHTML = `<input type="checkbox" onchange="toggleDebugOpt('${q.id}', ${opt.id}, this.checked)" class="mt-1 accent-cyan-500 w-4 h-4 rounded">
+                          <span class="text-xs md:text-sm text-slate-200">${opt.label}</span>`;
+        wrap.appendChild(item);
+      });
+      container.appendChild(wrap);
+    }
+
+    function toggleDebugOpt(qId, optId, isChecked) {
+      playSound('click');
+      if (!userAnswers[qId]) userAnswers[qId] = [];
+      if (isChecked) {
+        if (!userAnswers[qId].includes(optId)) userAnswers[qId].push(optId);
+      } else {
+        userAnswers[qId] = userAnswers[qId].filter(id => id !== optId);
+      }
+    }
+
+    // Trace Table
+    function renderTraceTable(q, container) {
+      userAnswers[q.id] = { valA: "", valB: "" };
+
+      const wrap = document.createElement('div');
+      wrap.className = 'space-y-4';
+      wrap.innerHTML = `
+        <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-4">
+          <div>
+            <label class="block text-xs font-bold text-cyan-400 mb-1">(a) Senaraikan nilai n yang digunakan (asingkan dengan koma):</label>
+            <input type="text" oninput="userAnswers['${q.id}'].valA = this.value.trim()" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-cyan-300 font-mono focus:border-cyan-500 focus:outline-none" placeholder="cth: 2, 3, 4, 5">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-cyan-400 mb-1">(b) Apakah nilai akhir 'jumlah'?</label>
+            <input type="text" oninput="userAnswers['${q.id}'].valB = this.value.trim()" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-cyan-300 font-mono focus:border-cyan-500 focus:outline-none" placeholder="cth: 14">
+          </div>
+        </div>
+      `;
+      container.appendChild(wrap);
+    }
+
+    // Code Fill Drag
+    function renderCodeFillDrag(q, container) {
+      userAnswers[q.id] = { slot1: "", slot2: "" };
+
+      const wrap = document.createElement('div');
+      wrap.className = 'space-y-3';
+      wrap.innerHTML = `
+        <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 code-font text-xs md:text-sm space-y-2 text-slate-200">
+          <div>markah = int(input("Masukkan markah: "))</div>
+          <div>if markah >= 80:</div>
+          <div class="pl-4 text-emerald-400">print("Cemerlang")</div>
+          <div class="my-1">
+            <select onchange="userAnswers['${q.id}'].slot1 = this.value" class="bg-slate-950 border border-cyan-800 text-cyan-300 px-2 py-1 rounded text-xs font-mono">
+              <option value="">-- tempat kosong 1 --</option>
+              <option value="elif markah >= 50:">elif markah >= 50:</option>
+              <option value="if markah >= 50:">if markah >= 50:</option>
+              <option value="else markah >= 50:">else markah >= 50:</option>
+            </select>
+          </div>
+          <div class="pl-4 text-emerald-400">print("Baik")</div>
+          <div class="my-1">
+            <select onchange="userAnswers['${q.id}'].slot2 = this.value" class="bg-slate-950 border border-cyan-800 text-cyan-300 px-2 py-1 rounded text-xs font-mono">
+              <option value="">-- tempat kosong 2 --</option>
+              <option value="else:">else:</option>
+              <option value="elif:">elif:</option>
+              <option value="else markah < 50:">else markah < 50:</option>
+            </select>
+          </div>
+          <div class="pl-4 text-emerald-400">print("Perlu usaha")</div>
+        </div>
+      `;
+      container.appendChild(wrap);
+    }
+
+    // Section C1
+    function renderSectionC1(q, container) {
+      userAnswers[q.id] = { typeVal: "", varVal: "", flowOrder: ["", "", "", "", "", ""] };
+
+      const wrap = document.createElement('div');
+      wrap.className = 'space-y-6';
+
+      wrap.innerHTML = `
+        <div class="bg-slate-900/90 border border-slate-800 p-4 rounded-xl space-y-3">
+          <div class="text-xs font-bold text-cyan-400 uppercase tracking-wider">(a) Soalan Analisis [2 Markah]</div>
+          <div class="space-y-3 text-xs md:text-sm">
+            <div>
+              <label class="block text-slate-300 mb-1">i. Apakah jenis struktur kawalan pilihan yang digunakan? [1m]</label>
+              <input type="text" oninput="userAnswers['${q.id}'].typeVal = this.value.trim()" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-cyan-300 font-mono text-xs focus:border-cyan-500 focus:outline-none" placeholder="Jawapan contoh: Pilihan bersarang">
+            </div>
+            <div>
+              <label class="block text-slate-300 mb-1">ii. Nyatakan dua pemboleh ubah yang sesuai digunakan: [1m]</label>
+              <input type="text" oninput="userAnswers['${q.id}'].varVal = this.value.trim()" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-cyan-300 font-mono text-xs focus:border-cyan-500 focus:outline-none" placeholder="cth: jumlah_buku, denda">
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-slate-900/90 border border-slate-800 p-4 rounded-xl space-y-3">
+          <div class="text-xs font-bold text-cyan-400 uppercase tracking-wider">(b) Bina Carta Alir Interaktif [8 Markah]</div>
+          <p class="text-xs text-slate-400">Pilih langkah yang betul mengikut urutan algoritma dari atas ke bawah:</p>
+          
+          <div class="space-y-2 max-w-md mx-auto">
+            ${[0,1,2,3,4,5].map(i => `
+              <div class="flex items-center space-x-2">
+                <span class="text-xs font-bold font-mono text-cyan-400 w-6">${i+1}.</span>
+                <select onchange="userAnswers['${q.id}'].flowOrder[${i}] = this.value" class="w-full bg-slate-950 border border-slate-700 text-xs text-slate-200 rounded-lg p-2 font-mono">
+                  <option value="">-- Pilih Simbol/Langkah --</option>
+                  <option value="Mula">Mula (Oval)</option>
+                  <option value="Masukkan jumlah buku dan status denda">Masukkan jumlah buku dan status denda (Parallelogram)</option>
+                  <option value="Jumlah buku < 3 ?">Jika jumlah buku < 3 ? (Diamond)</option>
+                  <option value="Tiada denda ?">Jika tiada denda ? (Diamond)</option>
+                  <option value="Paparkan &quot;Boleh meminjam&quot;">Paparkan "Boleh meminjam" / "Tidak boleh meminjam" (Parallelogram)</option>
+                  <option value="Tamat">Tamat (Oval)</option>
+                </select>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+      container.appendChild(wrap);
+    }
+
+    // Section C2
+    function renderSectionC2(q, container) {
+      userAnswers[q.id] = { calcVal: "", pyLine1: "", pyLine2: "", pyLine3: "" };
+
+      const wrap = document.createElement('div');
+      wrap.className = 'space-y-6';
+
+      wrap.innerHTML = `
+        <div class="bg-slate-900/90 border border-slate-800 p-4 rounded-xl space-y-3">
+          <div class="text-xs font-bold text-cyan-400 uppercase tracking-wider">(a) Pengiraan Bayaran [2 Markah]</div>
+          <div class="text-xs md:text-sm text-slate-300">
+            Sebuah rumah menggunakan <strong>150 unit</strong> elektrik.<br>
+            Berapakah jumlah bayaran yang dikira oleh program tersebut? (Formula: unit × 0.30)
+          </div>
+          <div class="flex items-center space-x-2">
+            <span class="text-sm font-bold text-slate-400">RM</span>
+            <input type="text" oninput="userAnswers['${q.id}'].calcVal = this.value.trim()" class="bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-sm text-cyan-300 font-mono w-48 focus:border-cyan-500 focus:outline-none" placeholder="45.00">
+          </div>
+        </div>
+
+        <div class="bg-slate-900/90 border border-slate-800 p-4 rounded-xl space-y-3">
+          <div class="text-xs font-bold text-cyan-400 uppercase tracking-wider">(b) Tulis Atur Cara Python Lengkap [8 Markah]</div>
+          <div class="space-y-3 code-font text-xs">
+            <div>
+              <label class="block text-slate-400 text-[11px] mb-1">Baris 1: Input unit elektrik [2m]</label>
+              <input type="text" oninput="userAnswers['${q.id}'].pyLine1 = this.value.trim()" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-cyan-300 focus:border-cyan-500 focus:outline-none" placeholder="unit = float(input(&quot;Masukkan unit elektrik: &quot;))">
+            </div>
+            <div>
+              <label class="block text-slate-400 text-[11px] mb-1">Baris 2: Formula pengiraan [3m]</label>
+              <input type="text" oninput="userAnswers['${q.id}'].pyLine2 = this.value.trim()" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-cyan-300 focus:border-cyan-500 focus:outline-none" placeholder="jumlah = unit * 0.30">
+            </div>
+            <div>
+              <label class="block text-slate-400 text-[11px] mb-1">Baris 3: Output paparan [2m + 1m kod betul]</label>
+              <input type="text" oninput="userAnswers['${q.id}'].pyLine3 = this.value.trim()" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-cyan-300 focus:border-cyan-500 focus:outline-none" placeholder="print(&quot;Jumlah bayaran ialah RM&quot;, jumlah)">
+            </div>
+          </div>
+        </div>
+      `;
+      container.appendChild(wrap);
+    }
+
+    /* =============================================================
+       EVALUATION AND SCORING ENGINE
+       ============================================================= */
+    function checkCurrentAnswer() {
+      const q = questionsData[currentQuestionIndex];
+      let earned = 0;
+      let isPerfect = false;
+
+      switch (q.type) {
+        case 'mcq': {
+          const u = userAnswers[q.id];
+          if (u === q.correct) {
+            earned = 1;
+            isPerfect = true;
+          }
+          break;
+        }
+
+        case 'tf_group': {
+          const u = userAnswers[q.id] || {};
+          let correctCount = 0;
+          Object.keys(q.correct).forEach(k => {
+            if (u[k] === q.correct[k]) correctCount++;
+          });
+          earned = correctCount; // 1 mark each
+          if (correctCount === 4) isPerfect = true;
+          break;
+        }
+
+        case 'tick_cross': {
+          const u = userAnswers[q.id] || {};
+          let correctCount = 0;
+          Object.keys(q.correct).forEach(k => {
+            if (u[k] === q.correct[k]) correctCount++;
+          });
+          earned = correctCount; // 1 mark each
+          if (correctCount === 4) isPerfect = true;
+          break;
+        }
+
+        case 'input_group': {
+          const u = userAnswers[q.id] || {};
+          let correctCount = 0;
+          Object.keys(q.correct).forEach(k => {
+            const val = (u[k] || "").toLowerCase().replace('₈', '').replace('8', '').trim();
+            if (val === q.correct[k]) correctCount++;
+          });
+          earned = correctCount; // 1 mark each
+          if (correctCount === 4) isPerfect = true;
+          break;
+        }
+
+        case 'matching_drop': {
+          const u = userAnswers[q.id] || {};
+          let correctCount = 0;
+          Object.keys(q.correct).forEach(k => {
+            if (u[k] === q.correct[k]) correctCount++;
+          });
+          earned = correctCount; // 1 mark each
+          if (correctCount === 4) isPerfect = true;
+          break;
+        }
+
+        case 'pseudocode_builder': {
+          const u = userAnswers[q.id] || {};
+          if (u.slot1 === q.correct[0] && u.slot2 === q.correct[1] && u.slot3 === q.correct[2]) {
+            earned = 4;
+            isPerfect = true;
+          } else {
+            let matches = 0;
+            if (u.slot1 === q.correct[0]) matches++;
+            if (u.slot2 === q.correct[1]) matches++;
+            if (u.slot3 === q.correct[2]) matches++;
+            earned = matches > 0 ? Math.floor((matches / 3) * 4) : 0;
+          }
+          break;
+        }
+
+        case 'output_fill': {
+          const u = userAnswers[q.id] || {};
+          let correctCount = 0;
+          if ((u[1] || "").trim() === q.correct[1]) correctCount++;
+          if ((u[2] || "").trim() === q.correct[2]) correctCount++;
+          if ((u[3] || "").trim() === q.correct[3]) correctCount++;
+
+          if (correctCount === 3) {
+            earned = 4;
+            isPerfect = true;
+          } else if (correctCount === 2) earned = 2;
+          else if (correctCount === 1) earned = 1;
+          break;
+        }
+
+        case 'debug_selection': {
+          const u = userAnswers[q.id] || [];
+          const correctIds = q.options.filter(o => o.correct).map(o => o.id);
+          const userHasOnlyCorrect = u.length === 2 && u.every(id => correctIds.includes(id));
+          if (userHasOnlyCorrect) {
+            earned = 4;
+            isPerfect = true;
+          } else if (u.some(id => correctIds.includes(id))) {
+            earned = 2;
+          }
+          break;
+        }
+
+        case 'trace_table': {
+          const u = userAnswers[q.id] || {};
+          const cleanA = (u.valA || "").replace(/\s+/g, '');
+          const cleanB = (u.valB || "").trim();
+
+          let markA = cleanA === "2,3,4,5" ? 2 : 0;
+          let markB = cleanB === "14" ? 2 : 0;
+          earned = markA + markB;
+          if (earned === 4) isPerfect = true;
+          break;
+        }
+
+        case 'code_fill_drag': {
+          const u = userAnswers[q.id] || {};
+          if (u.slot1 === q.correctSlots.slot1 && u.slot2 === q.correctSlots.slot2) {
+            earned = 4;
+            isPerfect = true;
+          } else if (u.slot1 === q.correctSlots.slot1 || u.slot2 === q.correctSlots.slot2) {
+            earned = 2;
+          }
+          break;
+        }
+
+        case 'section_c1': {
+          const u = userAnswers[q.id] || {};
+          // Part a (2m)
+          let markA1 = (u.typeVal || "").toLowerCase().includes("bersarang") ? 1 : 0;
+          let markA2 = ((u.varVal || "").toLowerCase().includes("buku") || (u.varVal || "").toLowerCase().includes("denda")) ? 1 : 0;
+
+          // Part b Flowchart (8m)
+          let flowMatches = 0;
+          const userOrder = u.flowOrder || [];
+          q.correctFlowchartOrder.forEach((step, idx) => {
+            if (userOrder[idx] === step) flowMatches++;
+          });
+          let markB = Math.round((flowMatches / 6) * 8);
+
+          earned = markA1 + markA2 + markB;
+          if (earned === 10) isPerfect = true;
+          break;
+        }
+
+        case 'section_c2': {
+          const u = userAnswers[q.id] || {};
+          // Part a (2m)
+          const cleanCalc = (u.calcVal || "").replace("RM", "").replace("rm", "").trim();
+          let markA = (cleanCalc === "45" || cleanCalc === "45.00") ? 2 : 0;
+
+          // Part b Python (8m)
+          let l1 = (u.pyLine1 || "").toLowerCase();
+          let l2 = (u.pyLine2 || "").toLowerCase();
+          let l3 = (u.pyLine3 || "").toLowerCase();
+
+          let markL1 = (l1.includes("unit") && (l1.includes("input") || l1.includes("float") || l1.includes("int"))) ? 2 : 0;
+          let markL2 = (l2.includes("jumlah") && l2.includes("*") && l2.includes("0.3")) ? 3 : 0;
+          let markL3 = (l3.includes("print") && l3.includes("jumlah")) ? 2 : 0;
+          let markSyntax = (markL1 > 0 && markL2 > 0 && markL3 > 0) ? 1 : 0;
+
+          earned = markA + markL1 + markL2 + markL3 + markSyntax;
+          if (earned === 10) isPerfect = true;
+          break;
+        }
+      }
+
+      // Record score
+      if (q.section === 'A') scores.secA += earned;
+      else if (q.section === 'B') scores.secB += earned;
+      else if (q.section === 'C') scores.secC += earned;
+
+      updateHeaderStats();
+
+      // UI Feedback
+      const feedbackContainer = document.getElementById('feedback-text');
+      if (isPerfect || earned === q.marks) {
+        playSound('correct');
+        feedbackContainer.className = "text-emerald-400 font-bold text-sm flex items-center gap-2";
+        feedbackContainer.innerHTML = `<span>Tahniah! Betul sepenuhnya. +${earned} markah! 🎉</span>`;
+      } else if (earned > 0) {
+        playSound('correct');
+        feedbackContainer.className = "text-amber-400 font-bold text-sm flex items-center gap-2";
+        feedbackContainer.innerHTML = `<span>Hampir tepat! Anda mendapat +${earned} daripada ${q.marks} markah.</span>`;
+      } else {
+        playSound('wrong');
+        feedbackContainer.className = "text-rose-400 font-bold text-sm flex items-center gap-2";
+        feedbackContainer.innerHTML = `<span>Cuba lagi! Petunjuk: ${q.hint}</span>`;
+      }
+
+      // Switch control buttons
+      document.getElementById('btn-submit').classList.add('hidden');
+      document.getElementById('btn-next').classList.remove('hidden');
+    }
+
+    function nextQuestion() {
+      playSound('click');
+      currentQuestionIndex++;
+      if (currentQuestionIndex < questionsData.length) {
+        renderQuestion();
+      } else {
+        showResults();
+      }
+    }
+
+    /* =============================================================
+       RESULTS AND EVALUATION SCREEN
+       ============================================================= */
+    function showResults() {
+      document.getElementById('screen-question').classList.add('hidden');
+      document.getElementById('screen-results').classList.remove('hidden');
+
+      const totalScore = scores.secA + scores.secB + scores.secC;
+      document.getElementById('final-score').textContent = totalScore;
+
+      document.getElementById('score-sec-a').textContent = scores.secA;
+      document.getElementById('score-sec-b').textContent = scores.secB;
+      document.getElementById('score-sec-c').textContent = scores.secC;
+
+      // Grade feedback
+      const gradeElem = document.getElementById('performance-grade');
+      if (totalScore >= 60) {
+        gradeElem.textContent = "Cemerlang! Kefahaman ASK Tingkatan 2 anda amat mantap! 🏆";
+        gradeElem.className = "text-sm font-bold text-emerald-400 mt-2";
+      } else if (totalScore >= 40) {
+        gradeElem.textContent = "Tahniah! Anda mencapai keputusan Kepujian. Teruskan usaha! 👍";
+        gradeElem.className = "text-sm font-bold text-cyan-400 mt-2";
+      } else {
+        gradeElem.textContent = "Boleh ditingkatkan lagi. Sila ulang kaji semula topik ini. 💪";
+        gradeElem.className = "text-sm font-bold text-amber-400 mt-2";
+      }
+    }
+  </script>
+</body>
+</html>
